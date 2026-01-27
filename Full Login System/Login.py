@@ -3,13 +3,26 @@ from tkinter import *
 from tkinter import messagebox
 import sqlite3
 
-# problem is; when btn register is clicked and all the input are oaky
-# then functon new_window should be exicute , 
-# but when any is required run then our register page is destroing 
-# so it should be prevent this
-# soln is: when all things is done and succesfylly data is addes to database then new_window() should exicute
 root=Tk()
+#database code
+conn=sqlite3.connect("userAuthentication.db")
+cur=conn.cursor()
 
+cur.execute('''
+            CREATE TABLE if not exists userAuthentication(
+                username text,
+                password text      
+            )
+            ''')
+
+cur.execute('SELECT * FROM userAuthentication')
+userLoginData=cur.fetchall()
+
+
+# cur.execute('''
+#             DELETE FROM userAuthentication
+#             WHERE [condition]
+#             ''')
 # functions
 
 def login():
@@ -19,30 +32,35 @@ def login():
     if not userpassword.get():
         messagebox.showwarning("Input Error","password is required")
     return
-def new_window():
+def root_window():
     root_register.destroy()
     root.deiconify()
-    root_register.protocol("WM_DELETE_WINDOW",new_window)
+
+def userRegisteration (username,password):
+    cur.execute('INSERT INTO userAuthentication VALUES(?,?)',(username.get(),password.get()))
+    conn.commit()
+    messagebox.showinfo("register","Registered successfully")  
+    root_window()
 
 def register_page(b):
-
+    root.withdraw() 
+    global root_register 
     
-    root.withdraw()
-    def register():
-    
+    def register(username_r,userPassword):
         if not username_r.get():
             messagebox.showwarning("Input Error","username is required")
-            return
-            
+            return 
         if not userPassword.get():
             messagebox.showwarning("Input Error","password is required")
             return
         if not userConfirmPassword.get():
             messagebox.showwarning("Input Error","Confirm password is required")
             return
-
-    
-    global root_register
+        if userPassword.get() != userConfirmPassword.get():
+            messagebox.showerror("Error", "Passwords do not match")
+            return
+        userRegisteration(username_r,userPassword)
+       
     root_register=Toplevel(root)
     root_register.grid_columnconfigure(0, weight=1)
     root_register.geometry("600x450")
@@ -74,11 +92,13 @@ def register_page(b):
     user_password_lbl.grid(row=5,column=0,sticky="ns",padx=20,pady=(20,0))
     userConfirmPassword=Entry(root_register,width=30,show="*")
     userConfirmPassword.grid(row=6,column=0,sticky="ns",ipadx=(2),ipady=(2))
-
-    btn=Button(root_register,text="Register",bd=1,relief="solid",font=("The new romans",12,"bold"),width=10, anchor="center",command=register)
-    btn.grid(row=7,column=0,pady=(30, 0))
     
 
+
+    btn=Button(root_register,text="Register",bd=1,relief="solid",font=("The new romans",12,"bold"),width=10, anchor="center",command=lambda:register(username_r,userPassword))
+    btn.grid(row=7,column=0,pady=(30, 0))
+    root_register.protocol("WM_DELETE_WINDOW", root_window) 
+    
 root.title("Login")
 root.geometry("600x450")
 root.resizable(0,0)
@@ -92,7 +112,6 @@ lbl=Label(
     font=("The new romans",16,"bold"))
 lbl.grid(row=0,column=0,sticky="ew")
 
-
 # user input username here
 user_name_lbl=Label(text="User Name",font=("arial",10))
 user_name_lbl.grid(row=1,column=0,sticky="ns",padx=20,pady=(40,0))
@@ -105,14 +124,13 @@ user_password_lbl.grid(row=3,column=0,sticky="ns",padx=20,pady=(20,0))
 userpassword=Entry(root,width=30,show="*")
 userpassword.grid(row=4,column=0,sticky="ns",ipadx=(2),ipady=(2))
 
-
+# login btn
 btn=Button(text="Login",bd=1,relief="solid",font=("The new romans",12,"bold"),width=10, anchor="center",command=login)
 btn.grid(row=5,column=0,pady=(30, 0))
 
+# dont have account? register button
 register_lbl = Label(root, text="Don't have account? Register", fg="blue", cursor="hand2")
 register_lbl.grid(row=6,column=0,pady=(10, 0))
 register_lbl.bind("<Button-1>",register_page) 
-# btn=Button(text="Don't have account? Register",font=("The new romans",12,),width=20, anchor="center",)
-# btn.grid(row=6,column=0,pady=(2))
 
 root.mainloop()
