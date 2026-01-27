@@ -16,8 +16,8 @@ cur.execute('''
             ''')
 
 cur.execute('SELECT * FROM userAuthentication')
-userLoginData=cur.fetchall()
 
+userLoginData=cur.fetchall()
 
 # cur.execute('''
 #             DELETE FROM userAuthentication
@@ -26,12 +26,22 @@ userLoginData=cur.fetchall()
 # functions
 
 def login():
+    def verification():
+        for i in userLoginData:
+            if username.get()==i[0] and userpassword.get()==i[1]:
+                messagebox.showinfo("Login","Login successfully")
+                return
+        else:
+            messagebox.showinfo("Login","Invalid credentials")
+                
     if not username.get():
         messagebox.showwarning("Input Error","username is required")
         return
     if not userpassword.get():
         messagebox.showwarning("Input Error","password is required")
-    return
+        return
+    verification()
+
 def root_window():
     root_register.destroy()
     root.deiconify()
