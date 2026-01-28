@@ -26,10 +26,10 @@ cur.execute('SELECT * FROM userAuthentication')
 userLoginData=cur.fetchall()
 
 # cur.execute('''
-#             DELETE FROM userAuthentication
-             
+#             DELETE FROM userAuthentication         
 #             ''')
 # conn.commit()
+
 # functions
 
 def login():
@@ -63,7 +63,7 @@ def register_page(b):
     root.withdraw() 
     global root_register 
     
-    def register(username_r,userPassword,hashPassword):
+    def register(username_r,userPassword,userConfirmPassword,hashPassword):
         if not username_r.get():
             messagebox.showwarning("Input Error","username is required")
             return 
@@ -120,7 +120,7 @@ def register_page(b):
     hashPassword=sha256.hexdigest()
     
         
-    btn=Button(root_register,text="Register",bd=1,relief="solid",font=("The new romans",12,"bold"),width=10, anchor="center",command=lambda:register(username_r,userPassword,hashPassword))
+    btn=Button(root_register,text="Register",bd=1,relief="solid",font=("The new romans",12,"bold"),width=10, anchor="center",command=lambda:register(username_r,userPassword,userConfirmPassword,hashPassword))
     btn.grid(row=7,column=0,pady=(30, 0))
     root_register.protocol("WM_DELETE_WINDOW", root_window) 
     
@@ -137,11 +137,13 @@ lbl=Label(
     font=("The new romans",16,"bold"))
 lbl.grid(row=0,column=0,sticky="ew")
 
+
 # user input username here
 user_name_lbl=Label(text="User Name",font=("arial",10))
 user_name_lbl.grid(row=1,column=0,sticky="ns",padx=20,pady=(40,0))
 username=Entry(root,width=30)
 username.grid(row=2,column=0,sticky="ns",ipadx=(2),ipady=(2))
+
 
 #user input passowrd here
 user_password_lbl=Label(text="Password",font=("arial",10))
@@ -149,8 +151,8 @@ user_password_lbl.grid(row=3,column=0,sticky="ns",padx=20,pady=(20,0))
 userpassword=Entry(root,width=30,show="*")
 userpassword.grid(row=4,column=0,sticky="ns",ipadx=(2),ipady=(2))
 
-# hashing user input password
 
+# hashing user input password
 inputPassword=userpassword.get()
 inputPassword_byte=inputPassword.encode()
 sha256.update(inputPassword_byte)
@@ -167,3 +169,5 @@ register_lbl.grid(row=6,column=0,pady=(10, 0))
 register_lbl.bind("<Button-1>",register_page) 
 
 root.mainloop()
+
+conn.close()
